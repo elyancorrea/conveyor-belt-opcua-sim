@@ -1,7 +1,5 @@
 import PySimpleGUI as sg
 from opcua import Client, ua
-import sim as sim
-
 
 CONFIG_FILE = 'config.cfg'
 
