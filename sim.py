@@ -65,23 +65,27 @@ def show():
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
-                running = False
+                    running = False
             elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                 # Check if the left mouse button is clicked
                 mouse_x, mouse_y = event.pos
                 # Check if the button to start/stop the conveyor belt is clicked
                 if (esteira.conveyor_control.rect.left <= mouse_x <= esteira.conveyor_control.rect.right and
-        esteira.conveyor_control.rect.top <= mouse_y <= esteira.conveyor_control.rect.bottom):
-
+                    esteira.conveyor_control.rect.top <= mouse_y <= esteira.conveyor_control.rect.bottom):
+                    esteira.conveyor_control.clicked = True  # Atualiza o atributo clicked antes de chamar o método
                     esteira_on = not esteira_on
                     esteira.start_stop()
+                elif (esteira.conveyor_control.rect.left <= mouse_x <= esteira.conveyor_control.rect.right and
+                    esteira.conveyor_control.rect.top <= mouse_y <= esteira.conveyor_control.rect.bottom + 50):
+                    esteira.conveyor_control.clicked = True  # Atualiza o atributo clicked antes de chamar o método
+                    esteira.colocar_caixa()
+                    colocar_caixa = True
             elif event.type == KEYDOWN:
                 if event.key == K_s:
                     esteira.start_stop()
                     esteira_on = not esteira_on
                     interface.write_node("status", str(esteira_on))
                 elif event.key == K_c:
-                    esteira.conveyor_control.feed_conveyor()
                     colocar_caixa = True
 
         window.fill((173, 216, 230))

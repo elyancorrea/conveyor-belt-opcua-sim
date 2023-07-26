@@ -9,11 +9,13 @@ class ConveyorControl:
         self.text = text
         self.running = False
         self.feeding = False  # Novo atributo para controlar o estado do botão "Alimenta esteira"
+        self.clicked = False  # Novo atributo para detectar cliques no botão
 
     def start_stop(self):
         self.running = not self.running
-
+        
     def feed_conveyor(self):
+        self.colocar_caixa = True
         # Toggle the state of the "Alimenta esteira" button when clicked
         self.feeding = not self.feeding if self.running else False
 
@@ -21,23 +23,30 @@ class ConveyorControl:
         pygame.draw.rect(window, (128, 128, 128), self.rect, border_radius=20)
         button_text = "Desligar" if self.running else "Ligar"
         button_color = (255, 0, 0) if self.running else (0, 255, 0)
+        if self.clicked:  # Altera a cor do botão ao ser clicado
+            button_color = (0, 255, 0) if self.running else (255, 0, 0)
+            self.clicked = False  # Reseta o atributo clicked após processar o clique
+
         pygame.draw.rect(window, button_color, self.rect)
         font = pygame.font.Font(None, 24)
         text_surface = font.render(button_text, True, (0, 0, 0))
         text_rect = text_surface.get_rect(center=self.rect.center)
         window.blit(text_surface, text_rect)
 
-        text_surface = font.render("Controle esteira:", True, (0, 0, 0))
+        text_surface = font.render("Controle:", True, (0, 0, 0))
         text_rect = text_surface.get_rect(center=(self.rect.centerx, self.rect.centery - 40))
         window.blit(text_surface, text_rect)
 
         # Draw the "Alimenta esteira" button in yellow or blue, depending on the state
         button_color = (0, 0, 255) if self.feeding else (255, 255, 0)
+        if self.clicked:  # Altera a cor do botão ao ser clicado
+            button_color = (255, 255, 0) if self.feeding else (0, 0, 255)
+            self.clicked = False  # Reseta o atributo clicked após processar o clique
+
         pygame.draw.rect(window, button_color, self.rect.move(0, self.rect.height + 10), border_radius=20)
         text_surface = font.render("Alimenta", True, (0, 0, 0))
         text_rect = text_surface.get_rect(center=self.rect.move(0, self.rect.height + 10).center)
         window.blit(text_surface, text_rect)
-
 
 class Arrow:
     def __init__(self, esteira):
@@ -80,6 +89,9 @@ class Esteira:
         pygame.draw.rect(window, (128, 128, 128), self.left_foot_rect)
         pygame.draw.rect(window, (128, 128, 128), self.right_foot_rect)
         self.conveyor_control.draw(window)
+    
+    def colocar_caixa(self):
+        self.conveyor_control.feed_conveyor()
 
     def start_stop(self):
         self.conveyor_control.start_stop()
