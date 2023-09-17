@@ -1,7 +1,6 @@
 import pygame
 import interface
 import pygame
-from pygame.locals import *
 
 class ConveyorControl:
     def __init__(self, x, y, width, height, text):
