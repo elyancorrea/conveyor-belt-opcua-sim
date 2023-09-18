@@ -11,7 +11,7 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'  # Você deve chamar isso antes do pygame
 class SimuladorEsteira:
     def __init__(self):
         pygame.init()
-        allowed_resolutions = [(800, 600), (1024, 768), (1280, 720)]  # Adicione as resoluções desejadas
+        pygame.display.set_icon(pygame.image.load('./assets/icon.png'))
 
         # Obtém a resolução da tela
         screen_width, screen_height = self.get_screen_resolution()
