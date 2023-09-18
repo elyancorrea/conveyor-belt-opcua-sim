@@ -3,6 +3,7 @@ from pygame.locals import *
 import interface
 import classes
 import os
+import sys
 
 os.environ['SDL_VIDEO_CENTERED'] = '1'  # You have to call this before pygame.init()
 
@@ -45,10 +46,18 @@ class SimuladorEsteira:
     def __init__(self):
         pygame.init()
         screen_width, screen_height = self.get_screen_resolution()
-        window = pygame.display.set_mode((screen_width - 10, screen_height - 50), pygame.RESIZABLE)
+        min_width, min_height = 800, 600
+
+        # Defina a largura e altura mínimas desejadas
+        self.min_width = min_width
+        self.min_height = min_height
+
+        # Crie a janela com a flag RESIZABLE
+        self.window = pygame.display.set_mode((screen_width - 10, screen_height - 50), pygame.RESIZABLE)
         pygame.display.set_caption("Simulador de Esteira")
         clock = pygame.time.Clock()
-        self.last_spawn_time = pygame.time.get_ticks()  # Initialize last_spawn_time here
+
+        self.last_spawn_time = pygame.time.get_ticks()
         self.esteira_width = int(screen_width * 0.50)
         esteira_x = (screen_width - self.esteira_width) // 2
         self.esteira = classes.Esteira(esteira_x, screen_height - 240, self.esteira_width, 50, 0, screen_width,
@@ -83,7 +92,7 @@ class SimuladorEsteira:
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()
-                    return
+                    sys.exit()
                 elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                     mouse_x, mouse_y = event.pos
                     if (self.conveyor_control.rect.left <= mouse_x <= self.conveyor_control.rect.right and
@@ -104,16 +113,22 @@ class SimuladorEsteira:
                     elif event.key == K_c:
                         self.colocar_caixa = True
 
-            window.fill((173, 216, 230))
+            # Atualiza o tamanho da janela se necessário
+            if self.window.get_width() < self.min_width:
+                self.window = pygame.display.set_mode((self.min_width, self.window.get_height()), pygame.RESIZABLE)
+            if self.window.get_height() < self.min_height:
+                self.window = pygame.display.set_mode((self.window.get_width(), self.min_height), pygame.RESIZABLE)
+
+            self.window.fill((173, 216, 230))
 
             self.esteira.speed = 1 if self.esteira_on else 0
 
-            self.esteira.draw(window)
+            self.esteira.draw(self.window)
             arrow.update()
-            arrow.draw(window)
+            arrow.draw(self.window)
 
             for sensor in self.sensores:
-                sensor.draw(window, self.pieces)
+                sensor.draw(self.window, self.pieces)
 
             if self.colocar_caixa:
                 self.colocar_caixa = False
@@ -125,11 +140,10 @@ class SimuladorEsteira:
             self.update_pieces()
             for piece in self.pieces:
                 piece.update()
-                piece.draw(window)
+                piece.draw(self.window)
 
             pygame.display.flip()
             clock.tick(60)
-
 
     def get_screen_resolution(self):
         info = pygame.display.Info()
@@ -152,6 +166,11 @@ class SimuladorEsteira:
             else:
                 piece.rect.y += 5
 
-
 if __name__ == "__main__":
     simulador = SimuladorEsteira()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
