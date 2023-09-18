@@ -110,7 +110,7 @@ class Esteira:
 
         for i, sensor in enumerate(self.sensores):
             sensor.rect.x = sensor_x  # Atualize a coordenada X diretamente
-            sensor.rect.y = self.screen_height - 300  # Mantenha a coordenada Y constante
+            sensor.rect.y = sensor_y  # Mantenha a coordenada Y constante
             sensor_x += sensor_width + sensor_padding
 
     def create_sensores(self):
