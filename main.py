@@ -5,37 +5,55 @@ import classes
 import os
 import sys
 
-os.environ['SDL_VIDEO_CENTERED'] = '1'  # You have to call this before pygame.init()
+# Configura o ambiente para centralizar a janela
+os.environ['SDL_VIDEO_CENTERED'] = '1'  # Você deve chamar isso antes do pygame.init()
 
 class SimuladorEsteira:
     def __init__(self):
         pygame.init()
+        
+        # Obtém a resolução da tela
         screen_width, screen_height = self.get_screen_resolution()
+        
+        # Define as dimensões mínimas da janela
         min_width, min_height = 800, 600
 
-        # Defina a largura e altura mínimas desejadas
+        # Armazena as dimensões mínimas
         self.min_width = min_width
         self.min_height = min_height
 
-        # Crie a janela com a flag RESIZABLE
+        # Cria a janela com a flag RESIZABLE
         self.window = pygame.display.set_mode((screen_width - 10, screen_height - 50), pygame.RESIZABLE)
         pygame.display.set_caption("Simulador de Esteira")
         clock = pygame.time.Clock()
 
+        # Inicializa o tempo do último spawn
         self.last_spawn_time = pygame.time.get_ticks()
+        
+        # Define a largura da esteira com base na largura da tela
         self.esteira_width = int(screen_width * 0.50)
+        
+        # Calcula a posição X da esteira para centralizá-la
         esteira_x = (screen_width - self.esteira_width) // 2
+        
+        # Cria a esteira
         self.esteira = classes.Esteira(esteira_x, screen_height - 240, self.esteira_width, 50, 0, screen_width,
                                        screen_height)
         arrow = classes.Arrow(self.esteira)
 
         num_sensores = 3
+        
+        # Define as dimensões dos sensores
         sensor_width = 20
         sensor_height = 80
+        
+        # Calcula o espaçamento entre os sensores com base na largura da esteira
         sensor_padding = (self.esteira_width - (num_sensores * sensor_width)) // (num_sensores - 1)
 
         self.sensores = []
         sensor_x = esteira_x
+        
+        # Cria os sensores
         for i in range(num_sensores - 1):
             sensor = classes.Sensor(sensor_x, screen_height - 300, sensor_width, sensor_height, "S" + str(i + 1))
             self.sensores.append(sensor)
@@ -50,7 +68,8 @@ class SimuladorEsteira:
         self.SPAWN_INTERVAL = 500
         self.last_spawn_time = 0
         self.esteira_on = False
-
+        
+        # Cria o controle da esteira
         self.conveyor_control = classes.ConveyorControl(screen_width * 0.1, screen_height * 0.1, 100, 50, "Ligar")
 
         while True:
@@ -60,16 +79,21 @@ class SimuladorEsteira:
                     sys.exit()
                 elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                     mouse_x, mouse_y = event.pos
+                    
+                    # Verifica se o botão de controle da esteira foi clicado
                     if (self.conveyor_control.rect.left <= mouse_x <= self.conveyor_control.rect.right and
                             self.conveyor_control.rect.top <= mouse_y <= self.conveyor_control.rect.bottom):
                         self.esteira.conveyor_control.clicked = True
                         self.esteira_on = not self.esteira_on
                         self.esteira.start_stop()
+                        
+                    # Verifica se o botão de colocar caixa foi clicado
                     elif (self.conveyor_control.rect.left <= mouse_x <= self.conveyor_control.rect.right and
                           self.conveyor_control.rect.top <= mouse_y <= self.conveyor_control.rect.bottom + 50):
                         self.esteira.conveyor_control.clicked = True
                         self.esteira.colocar_caixa()
                         self.colocar_caixa = True
+                        
                 elif event.type == KEYDOWN:
                     if event.key == K_s:
                         self.esteira.start_stop()
