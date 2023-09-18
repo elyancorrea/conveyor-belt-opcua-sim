@@ -75,14 +75,55 @@ class Esteira:
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.conveyor_control = ConveyorControl(screen_width * 0.1, screen_height * 0.1, 100, 50, "Ligar")
-        self.update_dimensions(x, y, width, height)
+        self.update_dimensions(x, screen_height - height, width, height)  # Define a coordenada Y para alinhar com a parte inferior
         self.speed = speed
         self.padding = 10
         foot_height = 120
         foot_width = self.width // 4
-        self.left_foot_rect = pygame.Rect(x + (self.width - foot_width) // 2, y + height, foot_width, foot_height)
-        self.right_foot_rect = pygame.Rect(x + (self.width - foot_width) // 2, y + height, foot_width, foot_height)
+        self.left_foot_rect = pygame.Rect(x + (width - foot_width) // 2, y + height, foot_width, foot_height)
+        self.right_foot_rect = pygame.Rect(x + (width - foot_width) // 2, y + height, foot_width, foot_height)
+        self.sensores = self.create_sensores()
 
+    def update_sensor_positions(self):
+        num_sensores = len(self.sensores)
+        sensor_width = 20
+        sensor_height = 80
+        sensor_padding = (self.width - (num_sensores * sensor_width)) // (num_sensores - 1)
+
+        sensor_x = self.x
+
+        for i, sensor in enumerate(self.sensores):
+            sensor.rect.x = sensor_x  # Atualize a coordenada X diretamente
+            sensor.rect.y = self.screen_height - 300  # Mantenha a coordenada Y constante
+            sensor_x += sensor_width + sensor_padding
+
+    def create_sensores(self):
+        num_sensores = 3
+        sensor_width = 20
+        sensor_height = 80
+        sensor_padding = (self.width - (num_sensores * sensor_width)) // (num_sensores - 1)
+
+        sensores = []
+        sensor_x = self.x
+
+        for i in range(num_sensores - 1):
+            sensor = Sensor(sensor_x, self.screen_height - 300, sensor_width, sensor_height, "S" + str(i + 1))
+            sensores.append(sensor)
+            sensor_x += sensor_width + sensor_padding
+
+        sensor_x = self.x + self.width - sensor_width
+        sensor = Sensor(sensor_x, self.screen_height - 300, sensor_width, sensor_height, "S" + str(num_sensores))
+        sensores.append(sensor)
+
+        return sensores
+
+    def update_sensores(self, pieces):
+        for sensor in self.sensores:
+            sensor.detect_piece(pieces)
+
+    def draw_sensores(self, window, pieces):
+        for sensor in self.sensores:
+            sensor.draw(window, pieces)
 
     def update_dimensions(self, x, y, width, height):
         self.x = x

@@ -11,7 +11,8 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'  # Você deve chamar isso antes do pygame
 class SimuladorEsteira:
     def __init__(self):
         pygame.init()
-        
+        allowed_resolutions = [(800, 600), (1024, 768), (1280, 720)]  # Adicione as resoluções desejadas
+
         # Obtém a resolução da tela
         screen_width, screen_height = self.get_screen_resolution()
         
@@ -23,6 +24,7 @@ class SimuladorEsteira:
         self.min_height = min_height
 
         # Cria a janela com a flag RESIZABLE
+        
         self.window = pygame.display.set_mode((screen_width - 10, screen_height - 50), pygame.RESIZABLE)
         pygame.display.set_caption("Simulador de Esteira")
         clock = pygame.time.Clock()
@@ -40,28 +42,6 @@ class SimuladorEsteira:
         self.esteira = classes.Esteira(esteira_x, screen_height - 240, self.esteira_width, 50, 0, screen_width,
                                        screen_height)
         arrow = classes.Arrow(self.esteira)
-
-        num_sensores = 3
-        
-        # Define as dimensões dos sensores
-        sensor_width = 20
-        sensor_height = 80
-        
-        # Calcula o espaçamento entre os sensores com base na largura da esteira
-        sensor_padding = (self.esteira_width - (num_sensores * sensor_width)) // (num_sensores - 1)
-
-        self.sensores = []
-        sensor_x = esteira_x
-        
-        # Cria os sensores
-        for i in range(num_sensores - 1):
-            sensor = classes.Sensor(sensor_x, screen_height - 300, sensor_width, sensor_height, "S" + str(i + 1))
-            self.sensores.append(sensor)
-            sensor_x += sensor_width + sensor_padding
-
-        sensor_x = esteira_x + self.esteira_width - sensor_width
-        sensor = classes.Sensor(sensor_x, screen_height - 300, sensor_width, sensor_height, "S" + str(num_sensores))
-        self.sensores.append(sensor)
 
         self.colocar_caixa = False
         self.pieces = []
@@ -120,12 +100,11 @@ class SimuladorEsteira:
             arrow.update()
             arrow.draw(self.window)
 
-            for sensor in self.sensores:
-                sensor.draw(self.window, self.pieces)
+            self.esteira.draw_sensores(self.window, self.pieces)
 
             if self.colocar_caixa:
                 self.colocar_caixa = False
-                for sensor in self.sensores:
+                for sensor in self.esteira.sensores:
                     if not sensor.detect_piece(self.pieces):
                         self.last_spawn_time = self.spawn_piece(sensor.rect.x, screen_height)
                         break
@@ -169,9 +148,9 @@ class SimuladorEsteira:
         if self.window.get_height() < self.min_height:
             self.window = pygame.display.set_mode((self.window.get_width(), self.min_height), pygame.RESIZABLE)
         esteira_x = (screen_width - self.esteira_width) // 2
-
         # Chame update_dimensions com todos os argumentos
         self.esteira.update_dimensions(esteira_x, screen_height - 240, self.esteira_width, 50)
+        self.esteira.update_sensor_positions()
 
 
 if __name__ == "__main__":
