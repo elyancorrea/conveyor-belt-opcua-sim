@@ -102,6 +102,10 @@ class SimuladorEsteira:
                     elif event.key == K_c:
                         self.colocar_caixa = True
 
+                # Verifica se a janela foi redimensionada
+                elif event.type == VIDEORESIZE:
+                    self.handle_resize(event.size)
+
             # Atualiza o tamanho da janela se necessário
             if self.window.get_width() < self.min_width:
                 self.window = pygame.display.set_mode((self.min_width, self.window.get_height()), pygame.RESIZABLE)
@@ -154,6 +158,21 @@ class SimuladorEsteira:
                 piece.moving = True
             else:
                 piece.rect.y += 5
+
+    def handle_resize(self, size):
+        screen_width, screen_height = size
+        min_width, min_height = 1000, 600
+        self.min_width = min_width
+        self.min_height = min_height
+        if self.window.get_width() < self.min_width:
+            self.window = pygame.display.set_mode((self.min_width, self.window.get_height()), pygame.RESIZABLE)
+        if self.window.get_height() < self.min_height:
+            self.window = pygame.display.set_mode((self.window.get_width(), self.min_height), pygame.RESIZABLE)
+        esteira_x = (screen_width - self.esteira_width) // 2
+
+        # Chame update_dimensions com todos os argumentos
+        self.esteira.update_dimensions(esteira_x, screen_height - 240, self.esteira_width, 50)
+
 
 if __name__ == "__main__":
     simulador = SimuladorEsteira()

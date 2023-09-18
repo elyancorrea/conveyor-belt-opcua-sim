@@ -32,7 +32,7 @@ class ConveyorControl:
         text_rect = text_surface.get_rect(center=self.rect.center)
         window.blit(text_surface, text_rect)
 
-        text_surface = font.render("Controle:", True, (0, 0, 0))
+        text_surface = font.render("Motor esteira:", True, (0, 0, 0))
         text_rect = text_surface.get_rect(center=(self.rect.centerx, self.rect.centery - 40))
         window.blit(text_surface, text_rect)
 
@@ -72,16 +72,26 @@ class Arrow:
 
 class Esteira:
     def __init__(self, x, y, width, height, speed, screen_width, screen_height):
-        self.width = width
-        self.rect = pygame.Rect(x, y, self.width, height)
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        self.conveyor_control = ConveyorControl(screen_width * 0.1, screen_height * 0.1, 100, 50, "Ligar")
+        self.update_dimensions(x, y, width, height)
         self.speed = speed
         self.padding = 10
-        foot_height = 120  # Altura dos pés
-        foot_width = self.width // 4  # Largura dos pés
-        # Adicionar retângulos dos pés da esteira
+        foot_height = 120
+        foot_width = self.width // 4
         self.left_foot_rect = pygame.Rect(x + (self.width - foot_width) // 2, y + height, foot_width, foot_height)
         self.right_foot_rect = pygame.Rect(x + (self.width - foot_width) // 2, y + height, foot_width, foot_height)
-        self.conveyor_control = ConveyorControl(screen_width*0.1,screen_height*0.1, 100, 50, "Ligar")
+
+
+    def update_dimensions(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.rect = pygame.Rect(x, y, width, height)
+        self.left_foot_rect = pygame.Rect(x + (width - self.width // 4) // 2, y + height, self.width // 4, 120)
+        self.right_foot_rect = pygame.Rect(x + (width - self.width // 4) // 2, y + height, self.width // 4, 120)
 
     def draw(self, window):
         pygame.draw.rect(window, (128, 128, 128), self.rect, border_radius=20)
@@ -94,6 +104,7 @@ class Esteira:
 
     def start_stop(self):
         self.conveyor_control.start_stop()
+
 
 class Sensor:
     def __init__(self, x, y, width, height, name):
