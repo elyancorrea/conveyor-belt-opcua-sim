@@ -7,41 +7,6 @@ import sys
 
 os.environ['SDL_VIDEO_CENTERED'] = '1'  # You have to call this before pygame.init()
 
-
-class ConveyorControl:
-    def __init__(self, x, y, width, height, text):
-        self.rect = pygame.Rect(x, y, width, height)
-        self.text = text
-        self.running = False
-        self.feeding = False
-
-    def start_stop(self):
-        self.running = not self.running
-
-    def feed_conveyor(self):
-        self.feeding = not self.feeding if self.running else False
-
-    def draw(self, window):
-        pygame.draw.rect(window, (128, 128, 128), self.rect, border_radius=20)
-        button_text = "Desligar" if self.running else "Ligar"
-        button_color = (255, 0, 0) if self.running else (0, 255, 0)
-        pygame.draw.rect(window, button_color, self.rect)
-        font = pygame.font.Font(None, 24)
-        text_surface = font.render(button_text, True, (0, 0, 0))
-        text_rect = text_surface.get_rect(center=self.rect.center)
-        window.blit(text_surface, text_rect)
-
-        text_surface = font.render("Controle:", True, (0, 0, 0))
-        text_rect = text_surface.get_rect(center=(self.rect.centerx, self.rect.centery - 40))
-        window.blit(text_surface, text_rect)
-
-        button_color = (0, 0, 255) if self.feeding else (255, 255, 0)
-        pygame.draw.rect(window, button_color, self.rect.move(0, self.rect.height + 10), border_radius=20)
-        text_surface = font.render("Alimenta", True, (0, 0, 0))
-        text_rect = text_surface.get_rect(center=self.rect.move(0, self.rect.height + 10).center)
-        window.blit(text_surface, text_rect)
-
-
 class SimuladorEsteira:
     def __init__(self):
         pygame.init()
@@ -86,7 +51,7 @@ class SimuladorEsteira:
         self.last_spawn_time = 0
         self.esteira_on = False
 
-        self.conveyor_control = ConveyorControl(screen_width * 0.1, screen_height * 0.1, 100, 50, "Ligar")
+        self.conveyor_control = classes.ConveyorControl(screen_width * 0.1, screen_height * 0.1, 100, 50, "Ligar")
 
         while True:
             for event in pygame.event.get():
