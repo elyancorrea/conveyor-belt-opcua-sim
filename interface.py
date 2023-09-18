@@ -3,27 +3,6 @@ from opcua import Client, ua
 
 CONFIG_FILE = 'config.cfg'
 
-def create_layout(config):
-    layout = [
-        [sg.Text('Endereço do servidor OPCUA:')],
-        [sg.InputText(default_text=config.get('endereco', ''), key='endereco')],
-        [sg.Text('NodeID do status da esteira:')],
-        [sg.InputText(default_text=config.get('status', ''), key='status')],
-        [sg.Text('NodeID do S1:')],
-        [sg.InputText(default_text=config.get('s1', ''), key='s1')],
-        [sg.Text('NodeID do S2:')],
-        [sg.InputText(default_text=config.get('s2', ''), key='s2')],
-        [sg.Text('NodeID do S3:')],
-        [sg.InputText(default_text=config.get('s3', ''), key='s3')],
-        [sg.Button('Conectar')],
-        [sg.Text('Estado da esteira:', key='status_value')],
-        [sg.Text('Valor do S1:', key='s1_value')],
-        [sg.Text('Valor do S2:', key='s2_value')],
-        [sg.Text('Valor do S3:', key='s3_value')],
-    ]
-    return layout
-
-
 def read_config_file():
     try:
         with open(CONFIG_FILE, 'r') as file:
@@ -38,22 +17,11 @@ def read_config_file():
         sg.popup(f'Erro ao ler o arquivo de configuração: {str(e)}', title='Erro')
         return {}
 
-
-def write_config_file(config):
-    try:
-        with open(CONFIG_FILE, 'w') as file:
-            for key, value in config.items():
-                file.write(f'{key}:{value}\n')
-    except Exception as e:
-        sg.popup(f'Erro ao escrever o arquivo de configuração: {str(e)}', title='Erro')
-
-
 def update_values(window, values):
     window['status_value'].update(f'Estado da esteira: {values["status"]}')
     window['s1_value'].update(f'Valor do S1: {values["s1"]}')
     window['s2_value'].update(f'Valor do S2: {values["s2"]}')
     window['s3_value'].update(f'Valor do S3: {values["s3"]}')
-
 
 def subscribe_node(client, node, handler):
     subscription = client.create_subscription(500, handler)
@@ -156,47 +124,9 @@ def connect_to_server(window, values):
         handler = SubHandler(window, values, 's3')
         subscribe_node(client, s3_node, handler)
 
-        # Escreve os valores no arquivo de configuração
-        write_config_file(values)
         return client, subscription_handler
     except ua.uaerrors.BadNodeIdUnknown as e:
         sg.popup(f'Erro: NodeID inválido! Detalhes: {str(e)}', title='Erro')
     except Exception as e:
         sg.popup(f'Erro ao conectar e ler do servidor OPCUA: {str(e)}', title='Erro')
     return None, None
-
-
-def main():
-    sg.theme('DefaultNoMoreNagging')
-
-    config = read_config_file()
-    layout = create_layout(config)
-
-    window = sg.Window('Aplicação OPCUA', layout)
-
-    client = None
-    subscription_handler = None
-
-    while True:
-        event, values = window.read()
-        if event == sg.WINDOW_CLOSED:
-            break
-        elif event == 'Conectar':
-            if '' in values.values():
-                sg.popup('Preencha todos os campos!', title='Erro')
-            else:
-                if client is not None:
-                    client.disconnect()
-                    print('Desconectado do servidor OPCUA')
-
-                client, subscription_handler = connect_to_server(window, values)
-
-    if subscription_handler is not None:
-        subscription_handler.delete()
-
-    if client is not None:
-        client.disconnect()
-        print('Desconectado do servidor OPCUA')
-
-    window.close()
-

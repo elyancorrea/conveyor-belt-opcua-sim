@@ -17,7 +17,7 @@ class SimuladorEsteira:
         screen_width, screen_height = self.get_screen_resolution()
         
         # Define as dimensões mínimas da janela
-        min_width, min_height = 800, 600
+        min_width, min_height = 600, 600
 
         # Armazena as dimensões mínimas
         self.min_width = min_width
