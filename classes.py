@@ -92,15 +92,19 @@ class Esteira:
         self.padding = 10
         foot_height = 120
         foot_width = self.width // 4
+    
         self.left_foot_rect = pygame.Rect(x + (self.width - foot_width) // 2, y + height, foot_width, foot_height)
         self.right_foot_rect = pygame.Rect(x + (self.width - foot_width) // 2, y + height, foot_width, foot_height)
         self.sensores = self.create_sensores()
+
+    
 
     def update_sensor_positions(self):
         num_sensores = len(self.sensores)
         sensor_width = 20
         sensor_height = 80
         sensor_padding = (self.width - (num_sensores * sensor_width)) // (num_sensores - 1)
+        sensor_y = self.rect.centery - sensor_height // 2
 
         sensor_x = self.x
 
