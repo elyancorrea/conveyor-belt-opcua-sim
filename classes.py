@@ -3,9 +3,8 @@ import interface
 import pygame
 
 class ConveyorControl:
-    def __init__(self, x, y, width, height, text):
+    def __init__(self, x, y, width, height):
         self.rect = pygame.Rect(x, y, width, height)
-        self.text = text
         self.running = False
         self.feeding = False  # Novo atributo para controlar o estado do botão "Alimenta esteira"
         self.clicked = False  # Novo atributo para detectar cliques no botão
@@ -32,9 +31,17 @@ class ConveyorControl:
         text_rect = text_surface.get_rect(center=self.rect.center)
         window.blit(text_surface, text_rect)
 
-        text_surface = font.render("Motor esteira:", True, (0, 0, 0))
-        text_rect = text_surface.get_rect(center=(self.rect.centerx, self.rect.centery - 40))
-        window.blit(text_surface, text_rect)
+        # Coordenadas para o texto "Motor esteira (Tecla S)"
+        motor_text_x = self.rect.centerx
+        motor_text_y = self.rect.centery - 40
+
+        # Coordenadas para o texto "Adiciona peça (Tecla C)"
+        add_piece_text_x = self.rect.centerx
+        add_piece_text_y = self.rect.centery + self.rect.height + 10
+
+        text_surface_motor = font.render("Motor esteira (Tecla S):", True, (0, 0, 0))
+        text_rect_motor = text_surface_motor.get_rect(center=(motor_text_x, motor_text_y))
+        window.blit(text_surface_motor, text_rect_motor)
 
         # Draw the "Alimenta esteira" button in yellow or blue, depending on the state
         button_color = (0, 0, 255) if self.feeding else (255, 255, 0)
@@ -42,10 +49,15 @@ class ConveyorControl:
             button_color = (255, 255, 0) if self.feeding else (0, 0, 255)
             self.clicked = False  # Reseta o atributo clicked após processar o clique
 
-        pygame.draw.rect(window, button_color, self.rect.move(0, self.rect.height + 10), border_radius=20)
-        text_surface = font.render("Alimenta", True, (0, 0, 0))
-        text_rect = text_surface.get_rect(center=self.rect.move(0, self.rect.height + 10).center)
-        window.blit(text_surface, text_rect)
+        pygame.draw.rect(window, button_color, self.rect.move(0, self.rect.height + 30))
+        text_surface_feed = font.render("Alimenta", True, (0, 0, 0))
+        text_rect_feed = text_surface_feed.get_rect(center=(add_piece_text_x, add_piece_text_y+20))
+        window.blit(text_surface_feed, text_rect_feed)
+
+        text_surface_add_piece = font.render("Adiciona peça (Tecla C):", True, (0, 0, 0))
+        text_rect_add_piece = text_surface_add_piece.get_rect(center=(add_piece_text_x, add_piece_text_y - 20))
+        window.blit(text_surface_add_piece, text_rect_add_piece)
+
 
 class Arrow:
     def __init__(self, esteira):
@@ -74,14 +86,14 @@ class Esteira:
     def __init__(self, x, y, width, height, speed, screen_width, screen_height):
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.conveyor_control = ConveyorControl(screen_width * 0.1, screen_height * 0.1, 100, 50, "Ligar")
-        self.update_dimensions(x, screen_height - height, width, height)  # Define a coordenada Y para alinhar com a parte inferior
+        self.conveyor_control = ConveyorControl(screen_width * 0.1, screen_height * 0.1, 100, 50)
+        self.update_dimensions(x, y, width, height)
         self.speed = speed
         self.padding = 10
         foot_height = 120
         foot_width = self.width // 4
-        self.left_foot_rect = pygame.Rect(x + (width - foot_width) // 2, y + height, foot_width, foot_height)
-        self.right_foot_rect = pygame.Rect(x + (width - foot_width) // 2, y + height, foot_width, foot_height)
+        self.left_foot_rect = pygame.Rect(x + (self.width - foot_width) // 2, y + height, foot_width, foot_height)
+        self.right_foot_rect = pygame.Rect(x + (self.width - foot_width) // 2, y + height, foot_width, foot_height)
         self.sensores = self.create_sensores()
 
     def update_sensor_positions(self):

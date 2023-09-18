@@ -50,7 +50,7 @@ class SimuladorEsteira:
         self.esteira_on = False
         
         # Cria o controle da esteira
-        self.conveyor_control = classes.ConveyorControl(screen_width * 0.1, screen_height * 0.1, 100, 50, "Ligar")
+        self.conveyor_control = classes.ConveyorControl(screen_width * 0.1, screen_height * 0.1, 100, 50)
 
         while True:
             for event in pygame.event.get():
@@ -69,7 +69,7 @@ class SimuladorEsteira:
                         
                     # Verifica se o botão de colocar caixa foi clicado
                     elif (self.conveyor_control.rect.left <= mouse_x <= self.conveyor_control.rect.right and
-                          self.conveyor_control.rect.top <= mouse_y <= self.conveyor_control.rect.bottom + 50):
+                          self.conveyor_control.rect.top <= mouse_y <= self.conveyor_control.rect.bottom + 100):
                         self.esteira.conveyor_control.clicked = True
                         self.esteira.colocar_caixa()
                         self.colocar_caixa = True
