@@ -78,7 +78,7 @@ class SimuladorEsteira:
                     if event.key == K_s:
                         self.esteira.start_stop()
                         self.esteira_on = not self.esteira_on
-                        interface.write_node("status", str(self.esteira_on))
+                        interface.write_node("status", self.esteira_on)
                     elif event.key == K_c:
                         self.colocar_caixa = True
 
